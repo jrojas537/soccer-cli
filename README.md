@@ -29,10 +29,25 @@ This tool is an OpenClaw skill that provides a set of commands to quickly retrie
     touch ~/.config/soccer-cli/config.yaml
     ```
 
-    Add your API key to the file in the following format:
+    Add your API key to the file, or use the `config set` command:
+    ```bash
+    soccer-cli config set apikey YOUR_API_KEY_HERE
+    ```
+    Alternatively, you can manually create a configuration file at `~/.config/soccer-cli/config.yaml` with the following format:
     ```yaml
     apikey: YOUR_API_KEY_HERE
     ```
+
+
+## Enhancements
+
+This version of `soccer-cli` includes several key improvements:
+
+-   **Improved Error Handling & User Experience:**
+    -   **Ambiguous Team Names:** The `scores` command now intelligently handles ambiguous team names. If multiple teams match your input, it will prompt you to select the correct team.
+    -   **Unified Error Output:** All error messages are now consistently formatted for better readability and easier debugging.
+-   **Configuration Management:** You can now easily set your API key directly from the command line using `soccer-cli config set apikey YOUR_API_KEY_HERE`.
+-   **Version Management:** The tool now includes proper versioning, allowing you to track releases and ensuring better stability.
 
 ## Usage
 

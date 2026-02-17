@@ -22,15 +22,13 @@ var squadCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fixtureID, err := strconv.Atoi(args[0])
 		if err != nil {
-			fmt.Println("Invalid fixture ID. It must be a number.")
-			os.Exit(1)
+			logError("Invalid fixture ID. It must be a number.")
 		}
 
 		client := api.NewClient(ApiKey)
 		teamStats, err := client.GetPlayerStatsForFixture(fixtureID)
 		if err != nil {
-			fmt.Printf("Error fetching player stats: %v\n", err)
-			os.Exit(1)
+			logError("fetching player stats: %v", err)
 		}
 
 		if len(teamStats) < 2 { // Expecting two teams

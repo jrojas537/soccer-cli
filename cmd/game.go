@@ -22,15 +22,13 @@ var gameCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fixtureID, err := strconv.Atoi(args[0])
 		if err != nil {
-			fmt.Println("Invalid fixture ID. It must be a number.")
-			os.Exit(1)
+			logError("Invalid fixture ID. It must be a number.")
 		}
 
 		client := api.NewClient(ApiKey)
 		details, err := client.GetFixtureDetails(fixtureID)
 		if err != nil {
-			fmt.Printf("Error fetching game details: %v\n", err)
-			os.Exit(1)
+			logError("fetching game details: %v", err)
 		}
 
 		if len(details) == 0 {

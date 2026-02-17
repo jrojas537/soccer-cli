@@ -9,6 +9,7 @@ import (
 
 var cfgFile string
 var ApiKey string
+var version = "dev"
 
 var rootCmd = &cobra.Command{
 	Use:   "soccer-cli",
@@ -16,12 +17,17 @@ var rootCmd = &cobra.Command{
 	Long: `soccer-cli is a command-line interface to interact with the API-Football
 service, allowing you to retrieve scores, game details, and squad information
 directly from your terminal.`,
+	Version: version,
+}
+
+func logError(message string, args ...interface{}) {
+	fmt.Fprintf(os.Stderr, "Error: "+message+"\n", args...)
+	os.Exit(1)
 }
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		logError("%v", err)
 	}
 }
 
@@ -46,18 +52,14 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("Config file not found. Please create one at ~/.config/soccer-cli/config.yaml")
-			fmt.Println("Example:\napikey: YOUR_API_KEY_HERE")
-			os.Exit(1)
+			logError("Config file not found. Please create one at ~/.config/soccer-cli/config.yaml\nExample:\napikey: YOUR_API_KEY_HERE")
 		} else {
-			fmt.Printf("Error reading config file: %s\n", err)
-			os.Exit(1)
+			logError("reading config file: %v", err)
 		}
 	}
 
 	ApiKey = viper.GetString("apikey")
 	if ApiKey == "" {
-		fmt.Println("API key is missing from the config file.")
-		os.Exit(1)
+		logError("API key is missing from the config file.")
 	}
 }

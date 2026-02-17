@@ -26,21 +26,37 @@ var scoresCmd = &cobra.Command{
 
 		teams, err := client.GetTeam(teamName)
 		if err != nil {
-			fmt.Printf("Error fetching team: %v\n", err)
-			os.Exit(1)
+			logError("fetching team: %v", err)
 		}
 
 		if len(teams) == 0 {
-			fmt.Printf("No team found matching '%s'\n", teamName)
-			os.Exit(1)
+			logError("No team found matching '%s'", teamName)
 		}
-		
-		// For simplicity, we'll use the first match
-		teamID := teams[0].Team.ID
+
+		var teamID int
+		if len(teams) > 1 {
+			fmt.Printf("Multiple teams found for '%s':\n", teamName)
+			for i, team := range teams {
+				fmt.Printf("%d. %s (ID: %d)\n", i+1, team.Team.Name, team.Team.ID)
+			}
+			fmt.Print("Please select a team by number: ")
+
+			var selection int
+			_, err := fmt.Scanln(&selection)
+			if err != nil {
+				logError("Invalid input. Please enter a number.")
+			}
+
+			if selection < 1 || selection > len(teams) {
+				logError("Invalid selection. Please choose a number from the list.")
+			}
+			teamID = teams[selection-1].Team.ID
+		} else {
+			teamID = teams[0].Team.ID
+		}
 		fixtures, err := client.GetLatestFixturesForTeam(teamID, 1)
 		if err != nil {
-			fmt.Printf("Error fetching fixtures: %v\n", err)
-			os.Exit(1)
+			logError("fetching fixtures: %v", err)
 		}
 
 		if len(fixtures) == 0 {
@@ -52,7 +68,7 @@ var scoresCmd = &cobra.Command{
 
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Date", "Home", "Score", "Away", "Status"})
-		
+
 		score := fmt.Sprintf("%d - %d", fixture.Goals.Home, fixture.Goals.Away)
 		date := time.Unix(int64(fixture.Fixture.Timestamp), 0).Format("2006-01-02")
 
@@ -64,7 +80,7 @@ var scoresCmd = &cobra.Command{
 			fixture.Teams.Away.Name,
 			fixture.Fixture.Status.Long,
 		})
-		
+
 		table.Render()
 	},
 }
